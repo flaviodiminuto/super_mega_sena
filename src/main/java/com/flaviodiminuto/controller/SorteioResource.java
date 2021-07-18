@@ -4,11 +4,13 @@ import com.flaviodiminuto.model.entity.SorteioEntity;
 import com.flaviodiminuto.model.http.output.HttpSorteioOutput;
 import com.flaviodiminuto.model.mapper.SorteioMapper;
 import com.flaviodiminuto.repository.SorteioRepository;
+import com.flaviodiminuto.service.SorteioService;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -20,36 +22,32 @@ import java.util.function.Function;
 public class SorteioResource {
 
     @Inject
-    SorteioRepository repository;
+    SorteioService service;
 
     @GET
     @Path("/ultimo")
-    public Response buscaUltimoSorteio(){
-        Optional<SorteioEntity> sorteio = repository.find("order by concurso desc").firstResultOptional();
+    public Response buscaUltimoSorteio() throws IOException, InterruptedException {
+        Optional<SorteioEntity> sorteio = service.getUltimoSorteio();
         if(sorteio.isPresent()) {
             HttpSorteioOutput sorteioOutput = SorteioMapper.entityToHttpOutput(sorteio.get());
             return Response.ok(sorteioOutput).build();
         } else
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-    //exemplo http://localhost:8080/sorteios?data=2020-09-15&quantidade=12
+    //exemplo http://localhost:8080/sorteios?data-inicial=2021-06-01&quantidade=3
     @GET
     public Response findByDateGreaterThan(
-            @QueryParam("data") String dateStr,
+            @QueryParam("data-inicial") String dateStr,
             @QueryParam("quantidade") String quantidadeStr){
-        if(quantidadeStr == null || dateStr == null )
+        if(quantidadeStr.isBlank() || dateStr.isBlank() )
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("data ou valor quantidade invalidos").build();
         LocalDate date = LocalDate.parse(dateStr);
         int quantidade = Integer.parseInt(quantidadeStr);
-        List<SorteioEntity> sorteioEntityList = repository.findByDateGreaterThan(date, quantidade);
-        Function<List<SorteioEntity>, Response> sorteioPreenchido = (list) -> Response.ok(list).build();
-        Function<List<SorteioEntity>, Response> verificaListaVazia = (list) -> list.isEmpty() ?
-                Response.status(Response.Status.NOT_FOUND).build() :
-                sorteioPreenchido.apply(list);
+        List<SorteioEntity> sorteioEntityList = service.findByDateGreaterThan(date, quantidade);
 
-        return verificaListaVazia.apply(sorteioEntityList);
+        return Response.ok(sorteioEntityList).build();
     }
 
 }

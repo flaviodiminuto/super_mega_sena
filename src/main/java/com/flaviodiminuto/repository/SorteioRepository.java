@@ -12,7 +12,7 @@ import java.util.List;
 public class SorteioRepository implements PanacheRepository<SorteioEntity> {
 
     public List<SorteioEntity> findByDateGreaterThan(LocalDate date, int limit) {
-        return find("data_sorteio > ?1", date)
+        return find("data_apuracao > ?1", date)
                 .page(Page.ofSize(limit))
                 .list();
     }

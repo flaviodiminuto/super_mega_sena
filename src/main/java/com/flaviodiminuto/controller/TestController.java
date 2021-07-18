@@ -14,7 +14,7 @@ public class TestController {
 
     @GET
     public Response get(){
-        service.requisitaUltimoSorteio();
+        service.requisitaUltimoSorteioAssincrono();
         return Response.ok().build();
     }
 }

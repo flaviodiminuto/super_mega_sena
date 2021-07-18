@@ -1,15 +1,21 @@
 package com.flaviodiminuto.model.mapper;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flaviodiminuto.constants.DataSpec;
 import com.flaviodiminuto.model.entity.SorteioEntity;
 import com.flaviodiminuto.model.http.input.HttpSorteioInput;
 import com.flaviodiminuto.model.http.output.HttpSorteioOutput;
+import io.vertx.core.json.JsonObject;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Arrays;
 
 public class SorteioMapper {
-
 
     public static SorteioEntity httpInputToEntity(HttpSorteioInput sorteio){
         return SorteioEntity.builder()
@@ -73,5 +79,16 @@ public class SorteioMapper {
                 .listaHttpRateioPremioOutput(RateioMapper.entityToHttpOutpu(sorteio))
                 .build();
 
+    }
+
+    public static SorteioEntity stringToEntity(String response) throws IOException {
+        return response.isBlank() ? null :
+                httpInputToEntity(stringToHttpInput(response));
+    }
+
+    public static HttpSorteioInput stringToHttpInput(String response) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+        return objectMapper.readValue(response.getBytes(StandardCharsets.UTF_8), HttpSorteioInput.class);
     }
 }

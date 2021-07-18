@@ -30,7 +30,6 @@ public class HttpClientService {
     }
 
     public void requisitaUltimoSorteioAssincrono() {
-        requisitaUltimoSorteioAssincrono();
         HttpClient client = HttpClient.newHttpClient();
         client.sendAsync(getRequest(), HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)

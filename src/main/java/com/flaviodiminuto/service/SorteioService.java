@@ -3,9 +3,11 @@ package com.flaviodiminuto.service;
 import com.flaviodiminuto.model.entity.SorteioEntity;
 import com.flaviodiminuto.model.mapper.SorteioMapper;
 import com.flaviodiminuto.repository.SorteioRepository;
+import io.quarkus.runtime.Startup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -28,16 +30,16 @@ public class SorteioService {
     Logger logger = LoggerFactory.getLogger(SorteioService.class);
 
     @Transactional
-    public boolean saveIfNotExist(SorteioEntity sorteioEntity){
-        if(sorteioEntity  == null )return false;
+    public Optional<SorteioEntity> saveIfNotExist(SorteioEntity sorteioEntity){
+        if(sorteioEntity  == null )return Optional.empty();
         Optional<SorteioEntity> sorteio = repository.findByIdOptional(sorteioEntity.getConcurso());
         if(sorteio.isEmpty()) {
             String message = String.format("Adicionando o sorteio %d na base de dados", sorteioEntity.getConcurso());
             logger.info(message);
             repository.persist(sorteioEntity);
-            return true;
+            return Optional.of(sorteioEntity);
         }
-        return false;
+        return Optional.empty();
     }
 
     public Optional<SorteioEntity> getUltimoSorteio() throws IOException, InterruptedException {
@@ -45,7 +47,7 @@ public class SorteioService {
                 .find("order by concurso desc")
                 .firstResultOptional();
 
-        if(sorteioEntityOptional.isPresent()){
+        if(sorteioEntityOptional.isPresent()) {
             SorteioEntity sorteioEntity = sorteioEntityOptional.get();
             LocalDate dataProximoConcurso = sorteioEntity.getDataProximoConcurso();
             LocalDateTime dataHoraSorteio = LocalDateTime.of(
@@ -56,26 +58,22 @@ public class SorteioService {
                     0
             );
 
-            // Verifica se o sorteio foi realizado em data anterior
-            // ou se já foi sorteado hoje
-            if(dataProximoConcurso.isBefore(LocalDate.now())
-            || (dataProximoConcurso.isEqual(LocalDate.now()) &&
-            LocalDateTime.now().isAfter(dataHoraSorteio)) ){
-                logger.info("Novo Sorteio realizado");
-                if(atualizaUltimoSorteio())
-                    return Optional.of(sorteioEntity);
-            }else{
-                //retorn a o ultimo sorteio registrado
+            // Verifica proximo será depois de hoje
+            // ou se é hoje mas ainda não chegou o horário
+            if (dataProximoConcurso.isAfter(LocalDate.now())
+                    || (dataProximoConcurso.isEqual(LocalDate.now()) &&
+                    LocalDateTime.now().isBefore(dataHoraSorteio))) {
+                //retorna o ultimo sorteio registrado
                 return sorteioEntityOptional;
             }
-        }else{
-            if(atualizaUltimoSorteio())
-                return getUltimoSorteio();
+
+            logger.info("Sorteio Realizado, os dados de ultimo sorteio serão atualizadoss");
         }
-        return Optional.empty();
+        logger.info("Atualizando os dados do Ultimo Sorteio");
+        return atualizaUltimoSorteio();
     }
 
-    private boolean atualizaUltimoSorteio() throws IOException, InterruptedException {
+    private Optional<SorteioEntity> atualizaUltimoSorteio() throws IOException, InterruptedException {
         //Buscar e salvar o sorteio mais recente
         HttpResponse<String> response = httpClientService.requisitaUltimoSorteioSincrono();
         SorteioEntity sorteio = SorteioMapper.stringToEntity(response.body());

@@ -31,15 +31,7 @@ public class SorteioService {
 
     @Transactional
     public Optional<SorteioEntity> saveIfNotExist(SorteioEntity sorteioEntity){
-        if(sorteioEntity  == null )return Optional.empty();
-        Optional<SorteioEntity> sorteio = repository.findByIdOptional(sorteioEntity.getConcurso());
-        if(sorteio.isEmpty()) {
-            String message = String.format("Adicionando o sorteio %d na base de dados", sorteioEntity.getConcurso());
-            logger.info(message);
-            repository.persist(sorteioEntity);
-            return Optional.of(sorteioEntity);
-        }
-        return Optional.empty();
+        return repository.saveIfNotExistis(sorteioEntity);
     }
 
     public Optional<SorteioEntity> getUltimoSorteio() throws IOException, InterruptedException {

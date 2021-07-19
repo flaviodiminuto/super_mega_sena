@@ -7,6 +7,7 @@ import io.quarkus.panache.common.Page;
 import javax.enterprise.context.ApplicationScoped;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @ApplicationScoped
 public class SorteioRepository implements PanacheRepository<SorteioEntity> {
@@ -15,5 +16,15 @@ public class SorteioRepository implements PanacheRepository<SorteioEntity> {
         return find("data_apuracao > ?1", date)
                 .page(Page.ofSize(limit))
                 .list();
+    }
+
+    public Optional<SorteioEntity> saveIfNotExistis(SorteioEntity sorteioEntity) {
+        if(sorteioEntity  == null )return Optional.empty();
+        Optional<SorteioEntity> sorteio = findByIdOptional(sorteioEntity.getConcurso());
+        if(sorteio.isEmpty()) {
+            persist(sorteioEntity);
+            return Optional.of(sorteioEntity);
+        }
+        return sorteio;
     }
 }

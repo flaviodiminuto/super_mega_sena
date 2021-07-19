@@ -18,7 +18,7 @@ import java.io.Serializable;
 public class LocalEntity implements Serializable {
     private final static long serialVersionUID = 7299392821561272371L;
     @Id
-    @Column(name = "id_sorteio") private Long idSorteio;
+    @Column(name = "concurso") private Long idSorteio;
     @Id @Column private String municipio;
     @Id @Column private String uf;
     @Column private Integer posicao;

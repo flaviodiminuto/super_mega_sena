@@ -1,6 +1,8 @@
 package com.flaviodiminuto.model.entity;
 
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -19,7 +21,7 @@ public class SorteioEntity {
     @Id
     @Column(nullable = false) private Long concurso;
     @Column(nullable = false, name = "data_apuracao") private LocalDate dataApuracao;
-    @Column(nullable = false, name = "data_proximo_sorteio") private LocalDate dataProximoConcurso;
+    @Column(name = "data_proximo_sorteio") private LocalDate dataProximoConcurso;
     @Column(nullable = false) private int colunaUm;
     @Column(nullable = false) private int colunaDois;
     @Column(nullable = false) private int colunaTres;
@@ -30,7 +32,8 @@ public class SorteioEntity {
     @Column(nullable = false) private int quantidadeGanhadoresFaixaDois;
     @Column(nullable = false) private int quantidadeGanhadoresFaixaTres;
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_sorteio") private List<LocalEntity> cidadeGanhadorFaixaUm;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "concurso") private List<LocalEntity> cidadeGanhadorFaixaUm;
     @Column(nullable = false) private boolean acumulado;
     @Column(nullable = false) private boolean sorteioespecial;
 

@@ -5,6 +5,7 @@ import com.flaviodiminuto.model.http.output.HttpSorteioOutput;
 import com.flaviodiminuto.model.mapper.SorteioMapper;
 import com.flaviodiminuto.repository.SorteioRepository;
 import com.flaviodiminuto.service.SorteioService;
+import com.flaviodiminuto.service.WebScrapping;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -23,6 +24,9 @@ public class SorteioResource {
 
     @Inject
     SorteioService service;
+
+    @Inject
+    WebScrapping webScrapping;
 
     @GET
     @Path("/ultimo")
@@ -48,6 +52,13 @@ public class SorteioResource {
         List<SorteioEntity> sorteioEntityList = service.findByDateGreaterThan(date, quantidade);
 
         return Response.ok(sorteioEntityList).build();
+    }
+
+    @POST
+    @Path("/adm/salva-historico")
+    public Response salvarHistorico() throws IOException {
+        webScrapping.process();
+        return  Response.ok().build();
     }
 
 }

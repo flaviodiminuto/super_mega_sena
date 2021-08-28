@@ -1,1 +1,1 @@
-web: java -jar target/quarkus-app/*-runner.jar
+web: java -jar target/*-runner.jar

@@ -6,6 +6,8 @@ import com.flaviodiminuto.model.mapper.SorteioMapper;
 import com.flaviodiminuto.repository.SorteioRepository;
 import com.flaviodiminuto.service.SorteioService;
 import com.flaviodiminuto.service.WebScrapping;
+import org.apache.http.HttpStatus;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -28,6 +30,9 @@ public class SorteioResource {
     @Inject
     WebScrapping webScrapping;
 
+    @ConfigProperty(name = "QUARKUS_HIGH")
+    String high;
+
     @GET
     @Path("/ultimo")
     public Response buscaUltimoSorteio() throws IOException, InterruptedException {
@@ -44,11 +49,11 @@ public class SorteioResource {
     public Response findByDateGreaterThan(
             @QueryParam("data-inicial") String dateStr,
             @QueryParam("quantidade") String quantidadeStr){
-        if(quantidadeStr.isBlank() || dateStr.isBlank() )
+        if(dateStr.isBlank() )
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("data ou valor quantidade invalidos").build();
+                    .entity("data inválida").build();
         LocalDate date = LocalDate.parse(dateStr);
-        int quantidade = Integer.parseInt(quantidadeStr);
+        int quantidade = quantidadeStr.isBlank() ? 10 : Integer.parseInt(quantidadeStr);
         List<SorteioEntity> sorteioEntityList = service.findByDateGreaterThan(date, quantidade);
 
         return Response.ok(sorteioEntityList).build();
@@ -56,9 +61,13 @@ public class SorteioResource {
 
     @POST
     @Path("/adm/salva-historico")
-    public Response salvarHistorico() throws IOException {
-        webScrapping.process();
-        return  Response.ok().build();
+    public Response salvarHistorico(@HeaderParam("high") String highHeader) throws IOException {
+        boolean high = this.high.equals(highHeader);
+        if(high){
+            webScrapping.process();
+            return  Response.ok().build();
+        }
+        return Response.status(HttpStatus.SC_FORBIDDEN).build();
     }
 
 }

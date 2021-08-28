@@ -30,7 +30,7 @@ public class SorteioResource {
     @Inject
     WebScrapping webScrapping;
 
-    @ConfigProperty(name = "QUARKUS_HIGH")
+    @ConfigProperty(name = "quarkus.high")
     String high;
 
     @GET

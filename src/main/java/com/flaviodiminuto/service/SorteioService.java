@@ -66,7 +66,7 @@ public class SorteioService {
     }
 
     private Optional<SorteioEntity> atualizaUltimoSorteio() throws IOException, InterruptedException {
-        //Buscar e salvar o sorteio mais recente
+        logger.info("Buscando sorteio atualizado na Caixa - " + LocalDateTime.now());
         HttpResponse<String> response = httpClientService.requisitaUltimoSorteioSincrono();
         SorteioEntity sorteio = SorteioMapper.stringToEntity(response.body());
         return saveIfNotExist(sorteio);

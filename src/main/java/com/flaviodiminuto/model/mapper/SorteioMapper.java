@@ -66,12 +66,12 @@ public class SorteioMapper {
                 .acumulado(sorteio.isAcumulado())
                 .indicadorConcursoEspecial(sorteio.isSorteioespecial())
                 .listaDezenas(
-                    Arrays.asList(String.valueOf(sorteio.getColunaUm()),
-                                String.valueOf(sorteio.getColunaDois()),
-                                String.valueOf(sorteio.getColunaTres()),
-                                String.valueOf(sorteio.getColunaQuatro()),
-                                String.valueOf(sorteio.getColunaCinco()),
-                                String.valueOf(sorteio.getColunaSeis()))
+                    Arrays.asList(zeroEsquerda(sorteio.getColunaUm()),
+                            zeroEsquerda(sorteio.getColunaDois()),
+                            zeroEsquerda(sorteio.getColunaTres()),
+                            zeroEsquerda(sorteio.getColunaQuatro()),
+                            zeroEsquerda(sorteio.getColunaCinco()),
+                            zeroEsquerda(sorteio.getColunaSeis()))
                 )
                 .numeroJogo(sorteio.getNumeroJogo())
                 .tipoPublicacao(sorteio.getTipoPublicacao())
@@ -151,5 +151,9 @@ public class SorteioMapper {
             locais.add(local);
         }
         return locais;
+    }
+
+    private static String zeroEsquerda(int value){
+        return value < 10 ? "00"+value : "0"+value;
     }
 }

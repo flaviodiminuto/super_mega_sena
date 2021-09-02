@@ -58,7 +58,7 @@ public class SorteioResource {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("data inválida").build();
         }
-        int quantidade = quantidadeStr.isBlank() ? 10 : Integer.parseInt(quantidadeStr);
+        int quantidade = quantidadeStr.isBlank() ? 10 : Math.min(Integer.parseInt(quantidadeStr), 1000);
         List<SorteioEntity> sorteioEntityList = service.findByDateGreaterThan(date, quantidade);
         List<HttpSorteioOutput> output = SorteioMapper.entityToHttpOutput(sorteioEntityList);
         return Response.ok(output).build();

@@ -49,14 +49,19 @@ public class SorteioResource {
     public Response findByDateGreaterThan(
             @QueryParam("data-inicial") String dateStr,
             @QueryParam("quantidade") String quantidadeStr){
-        if(dateStr.isBlank() )
+        LocalDate date;
+        try{
+            if(dateStr.isBlank())
+                throw new Exception("Formato de data inválido " + dateStr);
+           date = LocalDate.parse(dateStr);
+        }catch (Exception e){
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("data inválida").build();
-        LocalDate date = LocalDate.parse(dateStr);
+        }
         int quantidade = quantidadeStr.isBlank() ? 10 : Integer.parseInt(quantidadeStr);
         List<SorteioEntity> sorteioEntityList = service.findByDateGreaterThan(date, quantidade);
         List<HttpSorteioOutput> output = SorteioMapper.entityToHttpOutput(sorteioEntityList);
-        return Response.ok(sorteioEntityList).build();
+        return Response.ok(output).build();
     }
 
     @POST

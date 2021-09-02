@@ -53,7 +53,7 @@ public class SorteioMapper {
     public static HttpSorteioOutput entityToHttpOutput(SorteioEntity sorteio) {
         return HttpSorteioOutput.builder()
                 .concurso(sorteio.getConcurso().intValue())
-                .dataApuracao(sorteio.getDataApuracao().format(DataSpec.dataformat))
+                .dataApuracao(getDateString(sorteio.getDataApuracao()))
                 .valorArrecadado(sorteio.getValorArrecadado())
                 .valorEstimadoProximoConcurso(sorteio.getValorEstimatidoProximoConcurso())
                 .valorAcumuladoProximoConcurso(sorteio.getValorAcumuladoProximoConcurso())
@@ -73,7 +73,7 @@ public class SorteioMapper {
                 .tipoPublicacao(sorteio.getTipoPublicacao())
                 .observacao(sorteio.getObservacao())
                 .localSorteio(sorteio.getLocal())
-                .dataProximoConcurso(sorteio.getDataProximoConcurso().format(DataSpec.dataformat))
+                .dataProximoConcurso(getDateString(sorteio.getDataProximoConcurso()))
                 .numeroConcursoAnterior(sorteio.getNumeroConcursoAnterior())
                 .numeroConcursoProximo(sorteio.getNumeroConcursoProximo())
                 .valorTotalPremioFaixaUm(sorteio.getRateioFaixaUm())
@@ -81,6 +81,10 @@ public class SorteioMapper {
                 .listaHttpRateioPremioOutput(RateioMapper.entityToHttpOutpu(sorteio))
                 .build();
 
+    }
+
+    private static String getDateString(LocalDate data){
+        return data == null ? null : data.format(DataSpec.dataformat);
     }
 
     public static SorteioEntity stringToEntity(String response) throws IOException {

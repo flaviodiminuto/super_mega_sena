@@ -55,7 +55,7 @@ public class SorteioResource {
         LocalDate date = LocalDate.parse(dateStr);
         int quantidade = quantidadeStr.isBlank() ? 10 : Integer.parseInt(quantidadeStr);
         List<SorteioEntity> sorteioEntityList = service.findByDateGreaterThan(date, quantidade);
-
+        List<HttpSorteioOutput> output = SorteioMapper.entityToHttpOutput(sorteioEntityList);
         return Response.ok(sorteioEntityList).build();
     }
 

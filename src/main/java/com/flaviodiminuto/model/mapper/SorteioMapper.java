@@ -7,13 +7,8 @@ import com.flaviodiminuto.model.entity.LocalEntity;
 import com.flaviodiminuto.model.entity.SorteioEntity;
 import com.flaviodiminuto.model.http.input.HttpSorteioInput;
 import com.flaviodiminuto.model.http.output.HttpSorteioOutput;
-import io.vertx.core.json.JsonObject;
 import org.jsoup.nodes.Element;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.persistence.Column;
-import javax.persistence.Id;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +16,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SorteioMapper {
 
@@ -155,5 +151,9 @@ public class SorteioMapper {
 
     private static String zeroEsquerda(int value){
         return value < 10 ? "00"+value : "0"+value;
+    }
+
+    public static List<HttpSorteioOutput> entityToHttpOutput(List<SorteioEntity> entityList){
+        return entityList.stream().map(SorteioMapper::entityToHttpOutput).collect(Collectors.toList());
     }
 }

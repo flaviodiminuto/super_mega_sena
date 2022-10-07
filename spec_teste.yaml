@@ -1,0 +1,106 @@
+openapi: "3.0.2"
+info:
+  title: API Title
+  version: "1.0"
+
+servers:
+  - url: https://agenda/v1
+paths:
+  /atendimentos:
+    post:
+      description: Registra um novo atendimento
+      requestBody:
+        content:
+          applicatoin/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/atendimento'
+        required: true
+      responses:
+        '200':
+          description: OK - Registro de atendimento bem-sucedido
+    get:
+      responses:
+        '206':
+          description: Lista atendimentos
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/resposta'
+        '204':
+          description: Nenhum agendamento encontrado
+
+components:
+  schemas:
+    atendimento:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: string
+          format: date
+        periodo:
+          type: object
+          properties:
+            hora:
+              type: integer
+            minuto:
+              type: integer
+        servicos:
+          type: array
+          items:
+            $ref: '#/components/schemas/servico'
+      required:
+        - data
+        - status
+        - periodo
+          - hora
+          - minuto
+
+    servico:
+      type: object
+      properties:
+        nome:
+          type: string
+        valor:
+          type: number
+
+    paginacao:
+      type: object
+      properties:
+        pagina-atual:
+          type: integer
+        elementos-por-pagina:
+          type: integer
+        total-de-elementos:
+          type: integer
+        total-de-paginas:
+          type: integer
+        navegacao:
+          type: object
+          properties:
+            primeira-pagina:
+              type: string
+            pagina-anterior:
+              type: string
+            proxima-pagina:
+              type: string
+            ultima-pagina:
+              type: string
+
+    resposta:
+      type: object
+      properties:
+        atendimentos:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/atendimento'
+        paginacao:
+          type: object
+          $ref: '#/components/schemas/paginacao'
+
+

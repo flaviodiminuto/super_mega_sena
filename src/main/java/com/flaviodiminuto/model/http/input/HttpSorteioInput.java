@@ -1,15 +1,15 @@
 package com.flaviodiminuto.model.http.input;
 
+import com.fasterxml.jackson.annotation.*;
+import lombok.*;
+
+import javax.annotation.Generated;
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-
-import com.fasterxml.jackson.annotation.*;
-import lombok.*;
 
 @Data
 @AllArgsConstructor
@@ -46,7 +46,11 @@ import lombok.*;
         "listaDezenasSegundoSorteio",
         "listaResultadoEquipeEsportiva",
         "nomeTimeCoracaoMesSorte",
-        "id"})
+        "id",
+        "premiacaoContingencia",
+        "exibirDetalhamentoPorCidade",
+        "ultimoConcurso",
+        "valorSaldoReservaGarantidora"})
 @Generated("jsonschema2pojo")
 public class HttpSorteioInput {
 

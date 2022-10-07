@@ -1,6 +1,8 @@
 package com.flaviodiminuto.service;
 
 import com.flaviodiminuto.model.mapper.SorteioMapper;
+import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.http.ssl.SSLContextBuilder;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -9,6 +11,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
 @ApplicationScoped
 public class HttpClientService {
@@ -17,14 +22,11 @@ public class HttpClientService {
     SorteioService atualizaService;
 
     public HttpRequest getRequest() {
-        final long timestamp = System.currentTimeMillis();
-        String urlstr = "http://loterias.caixa.gov.br/wps/portal/loterias/landing/megasena/!ut/p/a1/04_Sj9CPykssy0xPLMnMz0vMAfGjzOLNDH0MPAzcDbwMPI0sDBxNXAOMwrzCjA0sjIEKIoEKnN0dPUzMfQwMDEwsjAw8XZw8XMwtfQ0MPM2I02-AAzgaENIfrh-FqsQ9wNnUwNHfxcnSwBgIDUyhCvA5EawAjxsKckMjDDI9FQE-F4ca/dl5/d5/L2dBISEvZ0FBIS9nQSEh/pw/Z7_HGK818G0KO6H80AU71KG7J0072/res/id=buscaResultado/c=cacheLevelPage/?timestampAjax=";
-        urlstr += timestamp;
-        HttpRequest request = HttpRequest.newBuilder()
-                .header("Cookie", "security=true")
+        String urlstr = "https://servicebus2.caixa.gov.br/portaldeloterias/api/megasena";
+        return HttpRequest.newBuilder()
                 .uri(URI.create(urlstr))
+                .GET()
                 .build();
-        return request;
     }
 
     public void requisitaUltimoSorteioAssincrono() {
@@ -45,7 +47,15 @@ public class HttpClientService {
     }
 
     public HttpResponse<String> requisitaUltimoSorteioSincrono() throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
+        HttpClient client = null;
+        try {
+            client = HttpClient.newBuilder()
+                    .sslContext(new SSLContextBuilder().loadTrustMaterial(null, TrustAllStrategy.INSTANCE).build())
+                    .build();
+        } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+            throw new RuntimeException(e);
+        }
+        client = client == null? HttpClient.newHttpClient() : client;
         return client.send(getRequest(), HttpResponse.BodyHandlers.ofString());
     }
 }
